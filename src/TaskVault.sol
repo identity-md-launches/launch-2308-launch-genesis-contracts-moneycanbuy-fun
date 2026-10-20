@@ -553,8 +553,7 @@ contract TaskVault {
             ImdPay memory noSwap;
             return _collectImd(from, msgValue, amount, address(0), noSwap);
         }
-        IERC20(currency).safeTransferFrom(from, address(this), amount);
-        liabilities[currency] += amount;
+        _pullToken(from, currency, amount);
         return 0;
     }
 
@@ -693,10 +692,16 @@ contract TaskVault {
             return amount;
         }
         if (currency == address(imd)) return _collectImd(from, msgValue, amount, adapter, payIn);
-        // USDC or $YOLO, paid directly (neither charges a transfer fee)
+        _pullToken(from, currency, amount);
+        return 0;
+    }
+
+    /// @dev Books `amount` of a plain token (USDC or $YOLO, paid directly: neither charges a transfer fee) pulled from
+    ///      `from`: the caller of createTask/topUp, or, for a bond part, the desk's caller (`collectBondPart` is
+    ///      desk-only, and a desk passes its own msg.sender). One pull for both paths (ADAPTATION.md).
+    function _pullToken(address from, address currency, uint256 amount) private {
         IERC20(currency).safeTransferFrom(from, address(this), amount);
         liabilities[currency] += amount;
-        return 0;
     }
 
     function _settleValue(address payer, uint256 msgValue, uint256 ethNeeded) private {

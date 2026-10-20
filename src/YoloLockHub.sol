@@ -137,13 +137,15 @@ contract YoloLockHub {
         if (h.length != 0) p = h[h.length - 1];
     }
 
+    /// @dev Writes `_history[who]` directly (not through a storage pointer): the same storage, read by static
+    ///      analysis as the write to `_history` it is (ADAPTATION.md).
     function _checkpoint(address who, uint96 pw, uint64 end, uint32 epoch) private {
-        Point[] storage h = _history[who];
-        uint256 n = h.length;
-        if (n != 0 && h[n - 1].at == block.timestamp) {
-            h[n - 1] = Point(uint64(block.timestamp), end, pw, epoch);
+        uint256 n = _history[who].length;
+        Point memory p = Point(uint64(block.timestamp), end, pw, epoch);
+        if (n != 0 && _history[who][n - 1].at == block.timestamp) {
+            _history[who][n - 1] = p;
         } else {
-            h.push(Point(uint64(block.timestamp), end, pw, epoch));
+            _history[who].push(p);
         }
     }
 }

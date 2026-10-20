@@ -58,7 +58,7 @@ launches of the platform (0.3–1.5%).
 
 The swarm's changes will hit the 24,576-byte per-contract limit (EIP-170) before the gas cap: by gas, launch 2 could
 take ~8.8 KB more new code (216 gas per byte, `ReviewLaunch.test_F2_marginalGasPerRuntimeByte`). Size headroom (`ReviewLaunch.test_L1_perContractCodeMargin_matchesDoc`):
-**DisputeDesk 3,087 bytes**, TaskVault 3,975, CaseDesk 4,512, YoloLockHub 21,357; YoloSweetener 17,828, DareTrophy
+**DisputeDesk 3,087 bytes**, TaskVault 3,952, CaseDesk 4,512, YoloLockHub 21,377; YoloSweetener 17,828, DareTrophy
 12,799, ProtocolDirectory 20,030, HiddenList 20,787, YoloPredict 18,191, TrophyCatalog 20,348; the support contracts from 11,024
 (ParamsRegistry) up. A swarm change of more than 3.1 KB in DisputeDesk breaks launch 2 on size. Launch 1 has eight of
 the eight contracts the factory allows; launch 2 has four, launch 3 six. Launch 0 has six of eight, all under 4 KB

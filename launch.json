@@ -1,0 +1,47 @@
+{
+  "kind": "evm_contracts",
+  "contracts": [
+    {
+      "contract": "NftGate",
+      "constructorArgs": [
+        "0x0000ec93127baa929e58e97dd0095a2bfb38ec1d",
+        "0x3c587Eff6c96eAcF7E3dcC2CFf6416161386E48C"
+      ]
+    },
+    {
+      "contract": "IncentivesVesting",
+      "constructorArgs": [
+        "0x7085193516EDc587fAebFF7a48548eAC8db5fAb5"
+      ]
+    },
+    {
+      "contract": "DevVesting",
+      "constructorArgs": [
+        "0x8Ad18E99F4C8d8406f9Ba8899CF308000518A981"
+      ]
+    },
+    {
+      "contract": "TeamVesting",
+      "constructorArgs": [
+        "0x153D12cc398d79A99B781B23DB6399556b84ca76"
+      ]
+    },
+    {
+      "contract": "TreasuryVesting",
+      "constructorArgs": [
+        "0x3c587Eff6c96eAcF7E3dcC2CFf6416161386E48C"
+      ]
+    },
+    {
+      "contract": "YoloSplitter",
+      "constructorArgs": [
+        "$contract:IncentivesVesting",
+        "$contract:DevVesting",
+        "$contract:TeamVesting",
+        "$contract:TreasuryVesting",
+        "0xaaB0269b956bd5F97B44529569b042e7BD72B508"
+      ]
+    }
+  ],
+  "notes": "Genesis contracts of moneycanbuy.fun, the first of four launches (script/LaunchPlan.sol genesisLaunch), deployed before the project token $YOLO. The $YOLO custom_token launch (the second) takes YoloSplitter as its remainderTo and NftGate as a token constructor argument; the core and $YOLO modules follow as the third and fourth launches. NftGate (src/token/NftGate.sol) is the snapshot of identity.md NFT holders (nft 0x0000ec93127baa929e58e97dd0095a2bfb38ec1d, 2,000 NFTs) for the first 30 minutes of $YOLO trading: the writer 0x3c587Eff6c96eAcF7E3dcC2CFf6416161386E48C (the project wallet) records wallets with their NFT count at one block in batches (record), then seal(snapshotBlock) closes the list for good. Each NFT allows its wallet 500,000 YOLO of buys in the token's window; the token calls consume(buyer, amount), which reverts until the seal, books per calling token, and never calls back. The gate never reads the NFT contract, has no owner and no clock. IncentivesVesting, DevVesting, TeamVesting and TreasuryVesting (src/token/Vestings.sol, ProjectVesting) have their schedules compiled in, no cliff: incentives 62,500,000 at once then linear over 730 days to 0x7085193516EDc587fAebFF7a48548eAC8db5fAb5; dev linear over 365 days to 0x8Ad18E99F4C8d8406f9Ba8899CF308000518A981; team linear over 365 days to 0x153D12cc398d79A99B781B23DB6399556b84ca76; treasury 74,074,074 at once then linear over 365 days to 0x3c587Eff6c96eAcF7E3dcC2CFf6416161386E48C. They know no token in advance (release(token)); whatever arrives counts; anyone may call release, which pays only the beneficiary what the schedule has opened. Each clock is started only by YoloSplitter, which binds itself as the single starter in this launch's transaction (bindStarter, a transient flag set in each vesting constructor and consumed by the splitter's constructor; the only external call at deployment). YoloSplitter (src/token/YoloSplitter.sol) receives the project's 75% of $YOLO as the remainderTo of the token launch. The first split(token), once more than 527,777,777 have arrived, pays 250,000,000 to IncentivesVesting, 150,000,000 to the manual YOLO Stabilizer wallet 0xaaB0269b956bd5F97B44529569b042e7BD72B508 (no vesting), 77,777,777 to DevVesting, 50,000,000 to TeamVesting and the rest (about 222,222,223) to TreasuryVesting, then calls release on the four vestings, starting their clocks and paying the at-once parts; later arrivals go to TreasuryVesting on the next call. Anyone may call it. Constructors take only addresses; no contract here holds funds until the token launch; no owner, admin, pause, upgrade path or fee in any of the six. The treasury and writer address 0x3c587Eff6c96eAcF7E3dcC2CFf6416161386E48C is the project wallet the brief names. Known and accepted by design: the snapshot is written by the project wallet from an off-chain read of ownerOf at one block (script/snapshot/snapshot.py; json, block and snapshotHash are published before trading opens); wallets holding NFTs through a contract at that block are listed as that contract; the incentives wallet is a plain wallet the contract only unlocks on schedule."
+}
